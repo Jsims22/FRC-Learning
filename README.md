@@ -1,2 +1,2 @@
 # FRC-Learning
-Code that I wrote fro learning stuff
+Code that I wrote for learning stuff
