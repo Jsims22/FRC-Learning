@@ -1,1 +1,38 @@
 import
+//Motor Controllers - Drive
+	Victor rightFrontDrive = new Victor(0);
+	Victor rightRearDrive = new Victor(1);
+	Victor leftFrontDrive = new Victor(2);
+	Victor leftRearDrive = new Victor(3);
+	//Motor Controllers - Outake/Intake
+	Victor outake = new Victor(4);
+	Victor intake = new Victor(5);
+	//Controller
+	Joystick LeftJoy = new Joystick(0);
+	Joystick RightJoy = new Joystick(0);
+	XboxController driver = new XboxController(0);
+	//Differential Drive Setup
+	SpeedControllerGroup leftSide = new SpeedControllerGroup(leftFrontDrive, leftRearDrive);
+	SpeedControllerGroup rightSide = new SpeedControllerGroup(rightFrontDrive, rightRearDrive);
+	DifferentialDrive driveTrain = new DifferentialDrive(leftSide, rightSide);
+	//Timer for autonomous
+	private Timer timer = new Timer();
+	double time;
+	//Get Joystick X/Y Functions, Get Trigger axis
+	double JoyDeadzone = 0.05;
+	public double getLeftJoyY() {
+		double raw = LeftJoy.getRawAxis(1);
+		return Math.abs(raw) < JoyDeadzone ? 0.0 : raw;	
+	}
+	public double getRightJoyX() {
+		double raw = RightJoy.getRawAxis(4);
+		return Math.abs(raw) < JoyDeadzone ? 0.0 : raw;	
+	}
+	private double getLeftTrigger() {
+		double raw = driver.getRawAxis(2);
+		return raw;
+	}
+	private double getRightTrigger() {
+		double raw = driver.getRawAxis(3);
+		return raw;
+	}
