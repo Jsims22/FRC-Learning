@@ -1,5 +1,31 @@
-import
-//Motor Controllers - Drive
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+package org.usfirst.frc.team2534.robot;
+
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
+/**
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the IterativeRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the manifest file in the resource
+ * directory.
+ */
+public class Robot extends IterativeRobot {
+	//Motor Controllers - Drive
 	Victor rightFrontDrive = new Victor(0);
 	Victor rightRearDrive = new Victor(1);
 	Victor leftFrontDrive = new Victor(2);
@@ -36,4 +62,123 @@ import
 		double raw = driver.getRawAxis(3);
 		return raw;
 	}
+	
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
+	@Override
+	public void robotInit() {
+	}
 
+	/**
+	 * This function is run once each time the robot enters autonomous mode.
+	 */
+	@Override
+	public void autonomousInit() {
+		//
+		timer.reset();
+		timer.start();
+		
+		
+	}
+
+	/**
+	 * This function is called periodically during autonomous.
+	 */
+	@Override
+	public void autonomousPeriodic() {
+		time = timer.get();
+		if (time < 4.5) {	//Move, Cross baseline, Stop on line, Turn on line, Shoot onto Switch
+			driveTrain.arcadeDrive(-0.5, 0.0); // drive forwards to line
+		} else if (time < 5.0) {
+			driveTrain.tankDrive(0.8, -0.8);// turn robot
+		} else if (time < 5.7){
+			outake.set(1.0);//drop ball
+		}else{
+			outake.set(0.0);//stop outake
+			driveTrain.arcadeDrive(0.0, 0.0);// stop robot
+		} 
+		
+		
+		if (time < 5.85) {	//Stop within 1ft of FAR wall (not full battery)
+			driveTrain.arcadeDrive(-0.8, -0.3); // move robot to far wall
+		}else{
+				driveTrain.arcadeDrive(0.0, 0.0);// stop robot
+		}
+		
+		double stop = 0.5; //Go around switch
+		double t1 = 2.0;
+		double t2 = 0.87 + stop;
+		double t3 = 1.87;
+		double t4 = 0.78 + stop;
+		double t5 = 1.27;
+		double t6 = 0.8 + stop;
+		double t7 = 1.65;
+		
+		if (time < t1) {
+			driveTrain.arcadeDrive(-0.8, -0.3);
+		}else if (time < t1+stop) {
+			driveTrain.tankDrive(0.0, 0.0);
+		}else if (time < t2 + t1){
+			driveTrain.tankDrive(-1.0, 1.0); //turn right 90 degrees
+		}else if(time < t3 + t2 + t1) {
+			driveTrain.arcadeDrive(-0.8, -0.3);
+		}else if(time < t3 + t2 + t1 + stop) {
+			driveTrain.tankDrive(0.0, 0.0);
+		}else if (time < t4 + t3 + t2 + t1){
+			driveTrain.tankDrive(-1.0, 1.0);
+		}else if (time < t5 + t4 + t3 + t2 + t1){
+			driveTrain.arcadeDrive(-0.8, -0.3);
+		}else if (time < t5 + t4 + t3 + t2 + t1 + stop){
+			driveTrain.tankDrive(0.0, 0.0);
+		}else if (time < t6 + t5 + t4 + t3 + t2 + t1){
+			driveTrain.tankDrive(-1.0, 1.0);
+		}else if (time < t7 + t6 + t5 + t4 + t3 + t2 + t1){
+			driveTrain.arcadeDrive(-0.8, -0.3);
+		}else{
+			driveTrain.arcadeDrive(0.0, 0.0); //stop robot
+		}
+		
+		
+	}
+
+	/**
+	 * This function is called once each time the robot enters teleoperated mode.
+	 */
+	@Override
+	public void teleopInit() {
+		
+	}
+
+	/**
+	 * This function is called periodically during teleoperated mode.
+	 */
+	@Override
+	public void teleopPeriodic() {
+		double throttle = ((1.0 - LeftJoy.getThrottle()) / -0.2);
+		driveTrain.arcadeDrive(-getLeftJoyY() * throttle, -getRightJoyX());
+		double leftTrig = getLeftTrigger();
+		if (leftTrig > 0.5) {
+			intake.set(-1.0);
+		}else {
+			intake.set(0.0);
+		}
+		double rightTrig = getRightTrigger();
+		if (rightTrig > 0.5) {
+			outake.set(1.0);
+		}else {
+			outake.set(0.0);
+		}
+		
+	}
+
+
+	/**
+	 * This function is called periodically during test mode.
+	 */
+	@Override
+	public void testPeriodic() {
+		
+	}
+}
